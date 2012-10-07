@@ -263,7 +263,7 @@ Animator = (function() {
     }
     this.actors = {};
     this.clear();
-    this.drawActors();
+    this.draw();
     return this;
   };
 

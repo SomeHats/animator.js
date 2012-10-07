@@ -226,7 +226,7 @@ class Animator
       @queue.shift()
     @actors = {}
     @clear()
-    @drawActors()
+    @draw()
 
     @
 
