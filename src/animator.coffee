@@ -179,6 +179,11 @@ class Animator
             @clear()
             @draw();
 
+          when Animator::CALLBACK
+            current.callback.apply current.context
+
+            @queue.shift()
+
           when Animator::DELAY
             if !current.end
               current.end = now + current.duration

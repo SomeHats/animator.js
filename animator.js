@@ -200,6 +200,9 @@ Animator = (function() {
             }
             this.clear();
             return this.draw();
+          case Animator.prototype.CALLBACK:
+            current.callback.apply(current.context);
+            return this.queue.shift();
           case Animator.prototype.DELAY:
             if (!current.end) {
               current.end = now + current.duration;
