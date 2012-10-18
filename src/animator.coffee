@@ -166,7 +166,7 @@ class Animator
                 current.originals[property] = actor[property]
 
             progress = (now - current.start) / current.duration
-            if progress > 1 
+            if progress >= 1 
               progress = 1
               current.start = null
               @queue.shift()
@@ -179,10 +179,14 @@ class Animator
             @clear()
             @draw();
 
+            if progress is 1
+              @tick()
+
           when Animator::CALLBACK
             current.callback.apply current.context
 
             @queue.shift()
+            @tick()
 
           when Animator::DELAY
             if !current.end
@@ -190,6 +194,7 @@ class Animator
 
             if now >= current.end
               @queue.shift()
+              @tick()
 
       else
         @running = no
