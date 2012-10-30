@@ -175,9 +175,8 @@ Animator = (function() {
 
 
   Animator.prototype.tick = function() {
-    var actor, current, name, now, progress, property, queue, _results;
+    var actor, current, name, now, progress, property, queue;
     if (this.running || true) {
-      _results = [];
       for (name in this.queue) {
         queue = this.queue[name];
         if (queue.length !== 0) {
@@ -202,18 +201,14 @@ Animator = (function() {
               for (property in current.change) {
                 actor[property] = this.easing[current.easing](current.originals[property], current.change[property], progress);
               }
-              this.clear();
-              this.draw();
               if (progress === 1) {
-                _results.push(this.tick());
-              } else {
-                _results.push(void 0);
+                this.tick();
               }
               break;
             case Animator.prototype.CALLBACK:
               current.callback.apply(current.context);
               queue.shift();
-              _results.push(this.tick());
+              this.tick();
               break;
             case Animator.prototype.DELAY:
               if (!current.end) {
@@ -221,19 +216,13 @@ Animator = (function() {
               }
               if (now >= current.end) {
                 queue.shift();
-                _results.push(this.tick());
-              } else {
-                _results.push(void 0);
+                this.tick();
               }
-              break;
-            default:
-              _results.push(void 0);
           }
-        } else {
-          _results.push(void 0);
         }
       }
-      return _results;
+      this.clear();
+      return this.draw();
     }
   };
 

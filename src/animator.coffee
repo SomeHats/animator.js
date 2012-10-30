@@ -179,9 +179,6 @@ class Animator
                                                           current.change[property],
                                                           progress);
 
-              @clear()
-              @draw();
-
               if progress is 1
                 @tick()
 
@@ -198,6 +195,8 @@ class Animator
               if now >= current.end
                 queue.shift()
                 @tick()
+      @clear()
+      @draw();
 
   ###
   Animator.draw
