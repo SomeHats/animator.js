@@ -152,7 +152,7 @@ class Animator
   Processes the next frame and calls functions to draw it.
   ###
   tick: ->
-    if @running or true
+    if @running
       for name of @queue
         queue = @queue[name]
         if queue.length isnt 0
@@ -196,7 +196,8 @@ class Animator
                 queue.shift()
                 @tick()
       @clear()
-      @draw();
+      @draw()
+      @start()
 
   ###
   Animator.draw
@@ -214,10 +215,12 @@ class Animator
   Start processing the queue
   ###
   start: ->
-    if !@running and @queue.length isnt 0
-      @running = yes
-    else if @queue.length is 0
-      @running = no
+    run = no
+    for queue in @queue
+      if queue.length isnt 0
+        run = yes
+    
+    @running = run
 
   ###
   Animator.reset
@@ -226,11 +229,14 @@ class Animator
   calls clear.
   ###
   reset: ->
-    while @queue.length
-      @queue.shift()
+    for queue in @queue
+      while queue.length
+        queue.shift()
+    @queue = {}
     @actors = {}
     @clear()
     @draw()
+    @start()
 
     @
 

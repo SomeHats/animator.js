@@ -176,7 +176,7 @@ Animator = (function() {
 
   Animator.prototype.tick = function() {
     var actor, current, name, now, progress, property, queue;
-    if (this.running || true) {
+    if (this.running) {
       for (name in this.queue) {
         queue = this.queue[name];
         if (queue.length !== 0) {
@@ -222,7 +222,8 @@ Animator = (function() {
         }
       }
       this.clear();
-      return this.draw();
+      this.draw();
+      return this.start();
     }
   };
 
@@ -251,11 +252,16 @@ Animator = (function() {
 
 
   Animator.prototype.start = function() {
-    if (!this.running && this.queue.length !== 0) {
-      return this.running = true;
-    } else if (this.queue.length === 0) {
-      return this.running = false;
+    var queue, run, _i, _len, _ref;
+    run = false;
+    _ref = this.queue;
+    for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+      queue = _ref[_i];
+      if (queue.length !== 0) {
+        run = true;
+      }
     }
+    return this.running = run;
   };
 
   /*
@@ -267,12 +273,19 @@ Animator = (function() {
 
 
   Animator.prototype.reset = function() {
-    while (this.queue.length) {
-      this.queue.shift();
+    var queue, _i, _len, _ref;
+    _ref = this.queue;
+    for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+      queue = _ref[_i];
+      while (queue.length) {
+        queue.shift();
+      }
     }
+    this.queue = {};
     this.actors = {};
     this.clear();
     this.draw();
+    this.start();
     return this;
   };
 
