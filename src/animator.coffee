@@ -217,7 +217,6 @@ class Animator
   start: ->
     run = no
     for name of @queue
-      console.log @queue[name].length
       if @queue[name].length isnt 0
         run = yes
     

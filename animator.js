@@ -255,7 +255,6 @@ Animator = (function() {
     var name, run;
     run = false;
     for (name in this.queue) {
-      console.log(this.queue[name].length);
       if (this.queue[name].length !== 0) {
         run = true;
       }
