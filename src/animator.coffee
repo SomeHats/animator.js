@@ -216,8 +216,9 @@ class Animator
   ###
   start: ->
     run = no
-    for queue in @queue
-      if queue.length isnt 0
+    for name of @queue
+      console.log @queue[name].length
+      if @queue[name].length isnt 0
         run = yes
     
     @running = run
@@ -229,9 +230,6 @@ class Animator
   calls clear.
   ###
   reset: ->
-    for queue in @queue
-      while queue.length
-        queue.shift()
     @queue = {}
     @actors = {}
     @clear()

@@ -252,12 +252,11 @@ Animator = (function() {
 
 
   Animator.prototype.start = function() {
-    var queue, run, _i, _len, _ref;
+    var name, run;
     run = false;
-    _ref = this.queue;
-    for (_i = 0, _len = _ref.length; _i < _len; _i++) {
-      queue = _ref[_i];
-      if (queue.length !== 0) {
+    for (name in this.queue) {
+      console.log(this.queue[name].length);
+      if (this.queue[name].length !== 0) {
         run = true;
       }
     }
@@ -273,14 +272,6 @@ Animator = (function() {
 
 
   Animator.prototype.reset = function() {
-    var queue, _i, _len, _ref;
-    _ref = this.queue;
-    for (_i = 0, _len = _ref.length; _i < _len; _i++) {
-      queue = _ref[_i];
-      while (queue.length) {
-        queue.shift();
-      }
-    }
     this.queue = {};
     this.actors = {};
     this.clear();
