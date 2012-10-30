@@ -56,8 +56,8 @@
 class Animator
   constructor: (raf = true) ->
     _ths = @
-    @queue = []
     @actors = {}
+    @queue = {}
     @running = no
 
     if raf
@@ -84,6 +84,7 @@ class Animator
       if @actors[name]
         throw "Actor '#{name}' already exists."
       @actors[name] = actor
+      @queue[name] = []
     else
       throw "No draw function for actor '#{name}' :("
 
@@ -108,7 +109,7 @@ class Animator
     item.easing = 'linear'
     item.actor = actor
 
-    @queue.push item
+    @queue[actor].push item
     @start()
 
     @
@@ -119,13 +120,13 @@ class Animator
   Queue a callback function, with an optional context. If no context is specified,
   the context is the animator object.
   ###
-  callback: (callback, ctx = @) ->
+  callback: (actor, callback, ctx = @) ->
     item = 
       type: Animator::CALLBACK
       callback: callback
       context: ctx
 
-    @queue.push item
+    @queue[actor].push item
     @start()
 
     @
@@ -135,12 +136,12 @@ class Animator
 
   Queue a delay of duration milliseconds.
   ###
-  delay: (duration) ->
+  delay: (actor, duration) ->
     item = 
       type: Animator::DELAY
       duration: duration
 
-    @queue.push item
+    @queue[actor].push item
     @start()
 
     @
@@ -151,53 +152,52 @@ class Animator
   Processes the next frame and calls functions to draw it.
   ###
   tick: ->
-    if @running
-      if @queue.length isnt 0
-        current = @queue[0]
-        now = Date.now()
+    if @running or true
+      for name of @queue
+        queue = @queue[name]
+        if queue.length isnt 0
+          current = queue[0]
+          now = Date.now()
 
-        switch current.type
-          when Animator::ANIMATE
-            actor = @actors[current.actor]
-            if !current.start
-              current.start = now
-              current.originals = {}
+          switch current.type
+            when Animator::ANIMATE
+              actor = @actors[current.actor]
+              if !current.start
+                current.start = now
+                current.originals = {}
+                for property of current.change
+                  current.originals[property] = actor[property]
+
+              progress = (now - current.start) / current.duration
+              if progress >= 1 
+                progress = 1
+                current.start = null
+                queue.shift()
+
               for property of current.change
-                current.originals[property] = actor[property]
+                actor[property] = @easing[current.easing](current.originals[property],
+                                                          current.change[property],
+                                                          progress);
 
-            progress = (now - current.start) / current.duration
-            if progress >= 1 
-              progress = 1
-              current.start = null
-              @queue.shift()
+              @clear()
+              @draw();
 
-            for property of current.change
-              actor[property] = @easing[current.easing](current.originals[property],
-                                                        current.change[property],
-                                                        progress);
+              if progress is 1
+                @tick()
 
-            @clear()
-            @draw();
+            when Animator::CALLBACK
+              current.callback.apply current.context
 
-            if progress is 1
+              queue.shift()
               @tick()
 
-          when Animator::CALLBACK
-            current.callback.apply current.context
+            when Animator::DELAY
+              if !current.end
+                current.end = now + current.duration
 
-            @queue.shift()
-            @tick()
-
-          when Animator::DELAY
-            if !current.end
-              current.end = now + current.duration
-
-            if now >= current.end
-              @queue.shift()
-              @tick()
-
-      else
-        @running = no
+              if now >= current.end
+                queue.shift()
+                @tick()
 
   ###
   Animator.draw
